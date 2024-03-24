@@ -16,5 +16,11 @@ Add Modal Dialog from Shacn UI
 
 -add Zustand package for small scale state management
 -create a ModalStore using Zustand
-- create a provide of Store Provider ( this make sure there is no hydration error)
+- create a provider of Store Provider ( this make sure there is no hydration error)
+
+##Step5
+Add form from shadcnui in Modal
+
+##Step 6
+Adding prisma and connecting with database (docker postgres/ neon/ vercel db)
 
