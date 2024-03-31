@@ -25,6 +25,7 @@ import { useParams, useRouter } from "next/navigation"
 import { AlertModal } from "@/components/modals/alert-modal"
 import { ApiAlert } from "@/components/ui/api-alert"
 import useOrigin from "@/hooks/use-origin"
+import ImageUpload from "@/components/ui/image-upload"
 
 
 
@@ -64,8 +65,14 @@ const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => {
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
             console.log(values)
-            await axios.patch(`/api/stores/${params.storeId}`, values)
+            if (initialData) {
+                await axios.patch(`/api/${params.storeId}/billboards/${params.billboardId}`, values);
+            } else {
+                await axios.post(`/api/${params.storeId}/billboards`, values);
+            }
+            toast.success(toastMessage)
             router.refresh()
+            router.push(`/${params.storeId}/billboards`);
             toast.success("Store updated successfully")
         } catch (error) {
             toast.error("Make sure you remove all product and categories first")
@@ -75,12 +82,13 @@ const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => {
 
     const onDelete = async () => {
         try {
-            await axios.delete(`/api/stores/${params.storeId}`)
+            await axios.delete(`/api/${params.storeId}/billboards/${params.billboardId}`)
             router.refresh()
-            toast.success("Store deleted successfully")
+            router.push(`/${params.storeId}/billboards`);
+            toast.success("Billboard deleted successfully")
         } catch (error) {
             console.log(error)
-            toast.error("Error in deleting")
+            toast.error("Make sure your remove all categories")
         } finally {
             setOpen(false)
         }
@@ -106,6 +114,24 @@ const BillboardForm: React.FC<BillboardFormProps> = ({ initialData }) => {
 
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                <FormField
+                    control={form.control}
+                    name="imageUrl"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Image</FormLabel>
+                            <FormControl>
+                                <ImageUpload
+                                    value={field.value ? [field.value] : []}
+                                    onChange={(url) => field.onChange(url)}
+                                    onRemove={() => field.onChange('')}
+                                    disabled={isSubmitting}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
                 <div className="grid grid-cols-3 space-y-8">
                     <FormField
                         control={form.control}
